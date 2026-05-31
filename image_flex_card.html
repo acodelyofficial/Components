@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Image Flex Card</title>
+  
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+    
+    body{
+      height:100vh;
+      display:grid;
+      place-items:center;
+      background:#0f172a;
+      font-family:Inter,sans-serif;
+      padding:24px;
+    }
+    
+    .gallery{
+      width:min(800px, 100%);
+      height:550px;
+      display:flex;
+      gap:16px;
+    }
+    
+    .card{
+      position:relative;
+      flex:1;
+      overflow:hidden;
+      border-radius:32px;
+      cursor:pointer;
+      transition:flex .7s cubic-bezier(.22,1,.36,1);
+    }
+    
+    .card.active{
+      flex:4;
+    }
+    
+    .card img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      transition:transform .9s ease;
+    }
+    
+    .card:hover img{
+      transform:scale(1.08);
+    }
+    
+    .overlay{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      padding:32px;
+    
+      background:
+      linear-gradient(
+        to top,
+        rgba(0,0,0,.85),
+        rgba(0,0,0,.15),
+        transparent
+      );
+    
+      color:white;
+    }
+    
+    .overlay span{
+      display:inline-flex;
+      width:max-content;
+      padding:8px 14px;
+    
+      border:1px solid rgba(255,255,255,.2);
+      backdrop-filter:blur(20px);
+    
+      background:rgba(255,255,255,.1);
+    
+      border-radius:999px;
+      margin-bottom:12px;
+      font-size:.8rem;
+    }
+    
+    .overlay h2{
+      font-size:2rem;
+      margin-bottom:10px;
+    }
+    
+    .overlay p{
+      max-width:420px;
+      opacity:.85;
+      line-height:1.6;
+    }
+    
+    .card:not(.active) .overlay h2,
+    .card:not(.active) .overlay p,
+    .card:not(.active) .overlay span{
+      opacity:0;
+      transform:translateY(20px);
+      transition-delay: -300ms;
+    }
+    
+    .overlay h2,
+    .overlay p,
+    .overlay span{
+      transition:.45s ease;
+      transition-delay: .4s;
+    }
+  </style>
+  
+</head>
+<body>
+  
+  <div class="gallery">
+
+    <article class="card active">
+      <img src="https://picsum.photos/id/1015/800/1200" alt="" loading="lazy">
+      <div class="overlay">
+        <span>Adventure</span>
+        <h2>Mountain Escape</h2>
+        <p>Explore breathtaking landscapes and unforgettable journeys.</p>
+      </div>
+    </article>
+  
+    <article class="card">
+      <img src="https://picsum.photos/id/1011/800/1200" alt="" loading="lazy">
+      <div class="overlay">
+        <span>Nature</span>
+        <h2>Forest Vibes</h2>
+        <p>Reconnect with nature through immersive experiences.</p>
+      </div>
+    </article>
+  
+    <article class="card">
+      <img src="https://picsum.photos/id/1016/800/1200" alt="" loading="lazy">
+      <div class="overlay">
+        <span>Travel</span>
+        <h2>Ocean Dream</h2>
+        <p>Discover crystal-clear waters and endless horizons.</p>
+      </div>
+    </article>
+  
+    <article class="card">
+      <img src="https://picsum.photos/id/1025/800/1200" alt="" loading="lazy">
+      <div class="overlay">
+        <span>Wildlife</span>
+        <h2>Golden Safari</h2>
+        <p>Experience wildlife in its most authentic habitat.</p>
+      </div>
+    </article>
+  
+  </div>
+  
+  <script>
+    const cards = document.querySelectorAll('.card');
+
+    cards.forEach(card => {
+    
+      card.addEventListener('mouseenter', () => {
+        cards.forEach(c =>
+          c.classList.remove('active')
+        );
+        card.classList.add('active');
+      });
+      
+      card.addEventListener('click', () => {
+        cards.forEach(c =>
+          c.classList.remove('active')
+        );
+        card.classList.add('active');
+      });
+    });
+  </script>
+  
+</body>
+</html>
