@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Interactive Delete Items</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:system-ui,sans-serif;
+    }
+    
+    body{
+      min-height:100vh;
+      background:#0f172a;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    }
+    
+    .container{
+      width:min(100%,400px);
+    }
+    
+    .item-wrapper{
+      position:relative;
+      margin-bottom:12px;
+      border-radius:16px;
+      overflow:hidden;
+    }
+    
+    .delete-bg{
+      position:absolute;
+      inset:0;
+      background:#ef4444;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      padding-right:24px;
+      color:white;
+      font-size:24px;
+      user-select:none;
+    }
+    
+    .item{
+      background:#1e293b;
+      color:white;
+      padding:20px;
+      border-radius:16px;
+      cursor:grab;
+      touch-action:pan-y;
+      position:relative;
+      z-index:2;
+      transition:transform.25s ease;
+      box-shadow:0 8px 20px rgba(0,0,0,.25);
+    }
+    
+    .item h3{
+      font-size:16px;
+      margin-bottom:4px;
+    }
+    
+    .item p{
+      opacity:.7;
+      font-size:14px;
+    }
+    
+    .removing{
+      transition:
+        transform.3s ease,
+        opacity.3s ease,
+        height.3s ease,
+        margin.3s ease;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="container">
+  
+    <div class="item-wrapper">
+      <div class="delete-bg"><i class="fa-solid fa-trash"></i></div>
+      <div class="item">
+        <h3>Project UI Dashboard</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur.</p>
+      </div>
+    </div>
+  
+    <div class="item-wrapper">
+      <div class="delete-bg"><i class="fa-solid fa-trash"></i></div>
+      <div class="item">
+        <h3>Landing Page</h3>
+        <p>Lorem ipsum dolor sit amet.</p>
+      </div>
+    </div>
+  
+    <div class="item-wrapper">
+      <div class="delete-bg"><i class="fa-solid fa-trash"></i></div>
+      <div class="item">
+        <h3>Portfolio Website</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+      </div>
+    </div>
+  
+  </div>
+  
+  <script>
+    document.querySelectorAll('.item').forEach(item => {
+    
+      let startX = 0;
+      let currentX = 0;
+      let dragging = false;
+    
+      function start(e){
+        dragging = true;
+        startX = e.touches? e.touches[0].clientX : e.clientX;
+        item.style.transition = 'none';
+      }
+    
+      function move(e){
+        if(!dragging) return;
+        currentX = e.touches? e.touches[0].clientX : e.clientX;
+        let deltaX = currentX - startX;
+        if(deltaX > 0) deltaX = 0;
+        item.style.transform = `translateX(${deltaX}px)`;
+      }
+    
+      function end(){
+        if(!dragging) return;
+        dragging = false;
+        const matrix = new DOMMatrix(getComputedStyle(item).transform);
+        const translateX = matrix.m41;
+        item.style.transition = 'transform.25s ease';
+    
+        if(translateX < -150){
+          item.style.transform = 'translateX(-150%)';
+          const wrapper = item.parentElement;
+          setTimeout(() => {
+            wrapper.classList.add('removing');
+            wrapper.style.height = wrapper.offsetHeight + 'px';
+            requestAnimationFrame(() => {
+              wrapper.style.opacity = '0';
+              wrapper.style.height = '0';
+              wrapper.style.margin = '0';
+            });
+            setTimeout(() => {
+              wrapper.remove();
+            },300);
+          },150);
+        }else{
+          item.style.transform = 'translateX(0)';
+        }
+      }
+    
+      item.addEventListener('touchstart', start);
+      item.addEventListener('touchmove', move);
+      item.addEventListener('touchend', end);
+      item.addEventListener('mousedown', start);
+      window.addEventListener('mousemove', move);
+      window.addEventListener('mouseup', end);
+    
+    });
+  </script>
+  
+</body>
+</html>
