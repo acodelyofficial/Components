@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
+  <title>Premium Custom Cursor</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 100%;
+      min-height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at top left, #1e293b 0%, transparent 40%), radial-gradient(circle at bottom right, #0f172a 0%, #020617 70%);
+      cursor: none;
+    }
+    
+    canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .cursor {
+      position: fixed;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      background: radial-gradient(circle, #ffffff 0%, #a855f7 50%, #3b82f6 100%);
+      box-shadow: 0 0 20px #3b82f6, 0 0 40px #a855f7, 0 0 80px #3b82f6;
+      transform: translate(-50%,-50%);
+      mix-blend-mode: screen;
+    }
+  </style>
+</head>
+<body>
+  
+  <canvas id="trail"></canvas>
+  <div class="cursor"></div>
+  
+  <script>
+    const canvas = document.getElementById("trail");
+    const ctx = canvas.getContext("2d");
+    
+    const cursor = document.querySelector(".cursor");
+    
+    let width;
+    let height;
+    
+    function resize(){
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    resize();
+    
+    window.addEventListener("resize", resize);
+    
+    let mouse = {
+      x: width/2,
+      y: height/2
+    };
+    
+    window.addEventListener("mousemove", e=>{
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+    
+    window.addEventListener("touchmove", e=>{
+      mouse.x = e.touches[0].clientX;
+      mouse.y = e.touches[0].clientY;
+    },{passive:true});
+    
+    const particles = [];
+    
+    class Particle{
+      
+      constructor(x,y){
+        
+        this.x = x;
+        this.y = y;
+        
+        this.size = Math.random()*8 + 4;
+        
+        this.vx = (Math.random()-0.5)*2;
+        this.vy = (Math.random()-0.5)*2;
+        
+        this.life = 1;
+        
+        this.color = [
+          "#3b82f6",
+          "#8b5cf6",
+          "#a855f7",
+          "#06b6d4"
+        ][Math.floor(Math.random()*4)];
+      }
+      
+      update(){
+        
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        this.vx *= 0.98;
+        this.vy *= 0.98;
+        
+        this.size *= 0.985;
+        this.life -= 0.015;
+      }
+      
+      draw(){
+        
+        ctx.save();
+        
+        ctx.globalAlpha = this.life;
+        
+        const gradient = ctx.createRadialGradient(
+          this.x,
+          this.y,
+          0,
+          this.x,
+          this.y,
+          this.size
+        );
+        
+        gradient.addColorStop(0,this.color);
+        gradient.addColorStop(1,"transparent");
+        
+        ctx.fillStyle = gradient;
+        
+        ctx.beginPath();
+        ctx.arc(
+          this.x,
+          this.y,
+          this.size,
+          0,
+          Math.PI*2
+        );
+        ctx.fill();
+        
+        ctx.restore();
+      }
+    }
+    
+    let trailX = mouse.x;
+    let trailY = mouse.y;
+    
+    function animate(){
+      
+      requestAnimationFrame(animate);
+      
+      ctx.fillStyle = "rgba(2,6,23,0.15)";
+      ctx.fillRect(0,0,width,height);
+      
+      trailX += (mouse.x - trailX) * 0.18;
+      trailY += (mouse.y - trailY) * 0.18;
+      
+      cursor.style.left = trailX + "px";
+      cursor.style.top = trailY + "px";
+      
+      for(let i=0;i<3;i++){
+        particles.push(
+          new Particle(
+            trailX,
+            trailY
+          )
+        );
+      }
+      
+      for(let i=particles.length-1;i>=0;i--){
+        
+        particles[i].update();
+        particles[i].draw();
+        
+        if(
+          particles[i].life <= 0 ||
+          particles[i].size < 0.5
+        ){
+          particles.splice(i,1);
+        }
+      }
+      
+      if(particles.length > 250){
+        particles.splice(
+          0,
+          particles.length - 250
+        );
+      }
+    }
+    
+    animate();
+  </script>
+  
+</body>
+</html>
